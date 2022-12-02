@@ -1,14 +1,25 @@
+token <-
+  "53616c7465645f5fd1593d974503b6cd0a0ddeb14ad5462f66a9fe354dbe9181c13d5fdd2fd4df345dbd05c2cfa6c112c92c256425ee12e8ca9b2d28437e2aa2"
+
+Sys.setenv(
+  AOC_SESSION = "53616c7465645f5fd1593d974503b6cd0a0ddeb14ad5462f66a9fe354dbe9181c13d5fdd2fd4df345dbd05c2cfa6c112c92c256425ee12e8ca9b2d28437e2aa2"
+)
+
+
+
 library(tidyverse)
-## data from https://adventofcode.com/2022/day/1/input
-## placed in file "data/day_01.txt")
+library(aor)
+
+aor::day_start("2022-12-01", "aoc2022/")
+
+
 
 ## Part One ----
 ## elf with most calories
 
 df <-data.frame(
-    row = 1:length(info),
     calories = readLines(
-      con = "data/day_01.txt"
+      con = "aoc2022/01_calorie_counting/input.txt"
     ) %>% 
       parse_number()
   ) %>% 
