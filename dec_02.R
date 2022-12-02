@@ -64,7 +64,7 @@ answer1
 
 ## Part 2 ----
 
-#aor::day_continue("2022-12-02", "aoc2022/")
+aor::day_continue("2022-12-02", "aoc2022/02_rock_paper_scissors/puzzle.R")
 
 decryption <- c(
   AX = "Z",
