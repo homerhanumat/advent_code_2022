@@ -6,70 +6,82 @@ input <- read_table(
   "input.txt", 
   col_names = FALSE
   )
-names(input) <- c("other", "you")
+names(input) <- c("opponent", "you")
 
-score_table <- data.frame(
-  plays = c(
-    "AX",
-    "AY",
-    "AZ",
-    "BX",
-    "BY",
-    "BZ",
-    "CX",
-    "CY",
-    "CZ"
+rules <- matrix(
+  c(
+    3, 6, 0,
+    0, 3, 6,
+    6, 0, 3
   ),
-  outcome = c(
-    3,
-    6,
-    0,
-    0,
-    3,
-    6,
-    6,
-    0,
-    3
-  )
+  nrow = 3,
+  byrow = TRUE
 )
+objects <- c("rock", "paper", "scissors")
+rownames(rules) <- objects
+colnames(rules) <- objects
 
-key <- score_table$outcome
-names(key) <- score_table$plays
-
-answer1 <-
+input_1 <-
   input %>% 
-  mutate(together = str_c(other, you, sep = "")) %>% 
-  mutate(shape_score = recode(you, X = 1, Y = 2, Z = 3)) %>% 
-  mutate(outcome_score = recode(together, !!!key)) %>% 
-  mutate(score = shape_score + outcome_score) %>% 
-  summarize(total = sum(score)) %>% 
-  pull(total)
+  mutate(opponent = recode(
+    opponent, A = "rock", B = "paper", C = "scissors")
+  )%>% 
+  mutate( you = recode(
+    you, X = "rock", Y = "paper", Z = "scissors")
+  ) %>% 
+  mutate(outcome_score = pmap_dbl(
+    list(opponent, you),
+    function(x, y) rules[x, y]
+  )) %>% 
+  mutate(shape_score = recode(
+    you,
+    "rock" = 1, "paper" = 2, "scissors" = 3
+    )
+  ) %>% 
+  mutate(score = outcome_score + shape_score)
 
-answer1
+answer_1 <-
+  input_1 %>% 
+  pull(score) %>% 
+  sum()
 
 ## Part 2 ----
 
-decryption <- c(
-  AX = "Z",
-  AY = "X",
-  AZ = "Y",
-  BX = "X",
-  BY = "Y",
-  BZ = "Z",
-  CX = "Y",
-  CY = "Z",
-  CZ = "X"
+your_play_decrypted <- c(
+  AX = "scissors",
+  AY = "rock",
+  AZ = "paper",
+  BX = "rock",
+  BY = "paper",
+  BZ = "scissors",
+  CX = "paper",
+  CY = "scissors",
+  CZ = "rock"
 )
 
-answer2 <-
+input_2 <-
   input %>% 
   mutate(outcome_score = recode(you, X =  0, Y = 3, Z = 6)) %>% 
-  mutate(together = str_c(other, you, sep = "")) %>% 
-  mutate(your_shape = recode(together, !!!decryption)) %>% 
-  mutate(shape_score = recode(your_shape, X = 1, Y = 2, Z = 3)) %>% 
-  mutate(score = shape_score + outcome_score) %>% 
-  summarize(total = sum(score)) %>% 
-  pull(total)
+  mutate(together = str_c(opponent, you, sep = "")) %>% 
+  mutate(your_object = recode(together,
+                              AX = "scissors",
+                              AY = "rock",
+                              AZ = "paper",
+                              BX = "rock",
+                              BY = "paper",
+                              BZ = "scissors",
+                              CX = "paper",
+                              CY = "scissors",
+                              CZ = "rock"
+                              )) %>% 
+  mutate(shape_score = recode(
+    your_object, "rock" = 1, "paper" = 2, "scissors" = 3)) %>% 
+  mutate(score = shape_score + outcome_score)
+
+answer_2 <-
+  input_2 %>% 
+  pull(score) %>% 
+  sum()
 
 
 
