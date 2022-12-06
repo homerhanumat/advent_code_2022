@@ -117,7 +117,7 @@ input <- read_lines("input.txt")
 divider <- which(input == "")
 
 input_arrangment <- input[1:(divider - 1)]
-input_directions <- input[(divider + 1):length(input)]
+directions <- input[(divider + 1):length(input)]
 
 
 parse_arrangement <- function(vec) {
@@ -197,7 +197,7 @@ move_cartons <- function(arr, direction, model) {
   }
 
 rearrange <- function(arr, model) {
-  for (direction in input_directions) {
+  for (direction in directions) {
     arr <- move_cartons(arr, direction, model)
   }
   arr
