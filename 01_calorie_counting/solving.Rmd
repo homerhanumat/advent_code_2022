@@ -1,0 +1,188 @@
+---
+title: "Counting Calories"
+author: "Homer White"
+output:
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  error = TRUE,
+  tidy = FALSE,
+  size = "small"
+)
+```
+
+
+## A Quick Solution
+
+Get the data:
+
+```{r}
+input <- readLines("input.txt")
+```
+
+Make it numeric:
+
+```{r}
+calories <- parse_number(input)
+```
+
+```{r}
+df <-
+  data.frame(
+    calories = calories
+  )
+```
+
+Every row  (except for the rows with `NA`) stands for an item in the rucksack of an elf.
+
+We would like a new column that has zeroes where there are calories, and 1s where there are `NA`-values.
+
+```{r}
+df <-
+  df %>% 
+  mutate(is_dividing_line = ifelse(
+    is.na(calories),
+    1, 0
+    )
+  )
+
+head(df, n = 5)
+```
+
+We would like to be able to group the items together into groups corresponding to each elf.  For this we use `cumsum()`.  Run `?cumsum` before proceeding.
+
+```{r}
+df <-
+  df %>% 
+  mutate(elf = cumsum(is_dividing_line))
+head(df, n = 20)
+```
+
+The elf ids are 0, 1, 2, and so on.
+
+
+We do not need the `NA`-values any more, so let's drop all the rows where `calories` is `NA`:
+
+```{r}
+df <- 
+  df %>% 
+  drop_na()
+```
+
+Now we have a tidy data table, and we are ready to wrangle in the usual **dplyr** way:
+
+```{r}
+rucksack_sums <-
+  df %>% 
+  group_by(elf) %>% 
+  summarize(total_calories = sum(calories))
+head(rucksack_sums)
+```
+
+We just want the biggest sum:
+
+```{r}
+rucksack_sums %>% 
+  slice_max(order_by = total_calories, n = 1) %>% 
+  pull(total_calories)
+```
+
+
+Of course you can pipe it all, like this:
+
+```{r}
+df <-data.frame(
+    calories = readLines(
+      con = "input.txt"
+    ) %>% 
+      parse_number()
+  ) %>% 
+  mutate(is_dividing_line = ifelse(
+    is.na(calories),
+    1, 0
+  )) %>% 
+  mutate(elf = cumsum(is_dividing_line)) %>% 
+  drop_na() %>% 
+  group_by(elf) %>% 
+  summarize(total_calories = sum(calories))
+```
+
+Then for Part One:
+
+```{r}
+df %>% 
+  slice_max(n = 1, order_by = total_calories) %>% 
+  pull(total_calories)
+```
+
+For Part Two:
+
+```{r}
+df %>% 
+  slice_max(n = 3, order_by = total_calories) %>% 
+  pull(total_calories) %>% 
+  sum()
+```
+
+
+## A Loopy Approach
+
+Begin as before:
+
+```{r}
+input <- readLines("input.txt")
+calories <- parse_number(input)
+```
+
+Now the loop:
+
+```{r}
+rucksack_sums <- numeric()
+current_item <- 1
+
+while(current_item <= length(calories)) {
+  pack_sum <- 0
+  while(!(is.na(calories[current_item]))) {
+    pack_sum <- pack_sum + calories[current_item]
+    current_item <- current_item + 1
+  }
+  rucksack_sums <- c(rucksack_sums, pack_sum)
+  ## move past the NA to the next elf:
+  current_item <- current_item + 1
+}
+```
+
+Then sort the sums:
+
+```{r}
+sorted_sums <-
+  sort(rucksack_sums, decreasing = TRUE)
+```
+
+Answer to Part One:
+
+```{r}
+sorted_sums[1]
+```
+
+Answer to Part Two:
+
+```{r}
+sorted_sums[1:3] %>% sum()
+```
+
+
+
+
+
+
+
+
