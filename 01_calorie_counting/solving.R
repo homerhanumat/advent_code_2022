@@ -35,3 +35,35 @@ answer2 <-
   sum()
 
 answer2
+
+## Thoughts ----
+
+## Nothing wrong with a loopy solution:
+
+calories <- readLines(
+  con = "input.txt"
+) |>
+  as.numeric()
+
+
+rucksack_sums <- numeric()
+elf <- 1
+item <- 1
+n <- length(calories)
+
+while (item <= n) {
+  sum <- 0
+  while (!is.na(calories[item]) & item <= n) {
+    sum <- sum + calories[item]
+    item <- item + 1
+  }
+  rucksack_sums[elf] <- sum
+  ## move past the NA:
+  item <- item + 1
+  elf <- elf + 1
+}
+
+sorted_sacks <- sort(rucksack_sums, decreasing = TRUE)
+
+answer_1 <- sorted_sacks[1]
+answer_2 <- sorted_sacks[1:3] |> sum()
