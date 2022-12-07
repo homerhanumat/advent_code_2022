@@ -129,6 +129,24 @@ initial_arrangement <-
 
 initial_arrangement
 
+## @tanho@fosstodon.org suggested read.fwf(), so
+## can shorten the above to:
+
+initial_arrangement <- 
+  readr::read_fwf(file = "input.txt", n_max = divider - 1) %>% 
+  .[nrow(.):1, ] %>% 
+  as.list() %>% 
+  unlist() %>% 
+  .[!is.na(.)] %>% 
+  .[-1] %>% 
+  str_c(collapse = "") %>% 
+  str_replace_all(pattern = "[\\[\\]]", replacement = "") %>% 
+  str_split(pattern = "\\d") %>% 
+  unlist() %>% 
+  str_split(pattern = "")
+
+
+
 ## Part 2 ----
 
 move_2 <- function(arrangement) {
@@ -162,7 +180,7 @@ answer_2 <-
 
 answer_2
 
-### Refactor to Make more "Functional" ----
+### Refactor to Make More "Functional" ----
 
 ## I am not yet satisfied with this, but ...
 
@@ -170,53 +188,20 @@ input <- read_lines("input.txt")
 
 divider <- which(input == "")
 
-input_arrangment <- input[1:(divider - 1)]
 directions <- input[(divider + 1):length(input)]
 
-
-parse_arrangement <- function(vec) {
-  
-  ## fiind column-numbers of arrangment:
-  cols <-
-    input[length(vec)] %>% 
-    str_split(pattern = "\\s+") %>% 
-    unlist() %>% 
-    parse_number() %>% 
-    .[!is.na(.)]
-  ncol <- length(cols)
-  
-  ## unable to say how stacks would be placed
-  ## over a column number with more than 2 digits.
-  ## assuming one-digit collumn-numbers:
-  stack_indices <- seq(from = 2, by = 4, length.out = ncol)
-  
-  ## arrangement will be a list of character vectors:
-  arrangement <- vector(mode = "list", length = ncol)
-  
-  parse_stack <- function(col) {
-    level <- length(vec) - 1
-    stack <- character()
-    stack_index <- stack_indices[col]
-    while(level >= 1) {
-      carton <-
-        input[level] %>% 
-        str_sub(start = stack_index, end = stack_index)
-      if (carton == " ") break
-      stack <- c(stack, carton)
-      level <- level - 1
-    }
-    stack
-  }
-  
-  arrangment <-
-    cols %>% 
-    map(parse_stack)
-  
-  arrangment
-}
-
-initial_arrangement <-
-  parse_arrangement(input_arrangment)
+initial_arrangement <- 
+  readr::read_fwf(file = "input.txt", n_max = divider - 1) %>% 
+  .[nrow(.):1, ] %>% 
+  as.list() %>% 
+  unlist() %>% 
+  .[!is.na(.)] %>% 
+  .[-1] %>% 
+  str_c(collapse = "") %>% 
+  str_replace_all(pattern = "[\\[\\]]", replacement = "") %>% 
+  str_split(pattern = "\\d") %>% 
+  unlist() %>% 
+  str_split(pattern = "")
 
 
 move_cartons <- function(arr, direction, model) {
