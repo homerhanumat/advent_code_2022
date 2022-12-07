@@ -2,7 +2,7 @@ library(tidyverse)
 
 ## Part One ----
 
-input <- readLines("input.txt")
+input <- readLines("test.txt")
 
 
 after_cd <-
@@ -11,6 +11,37 @@ after_cd <-
   str_extract(pattern = "(?<=cd ).*")
 
 ## the only cd moves are one up or one down
+
+command_history <- list()
+
+command_indices <- which(str_detect(input, pattern = "\\$"))
+next_indicies <- c(command_indices[-1], length(input) + 1)
+output_lens <- next_indicies - command_indices - 1
+
+parse_command <- function(index,len) {
+  command <- input[index]
+  type <- ifelse(
+    str_detect(command, patter = "\\$ cd"),
+    "cd",
+    "ls"
+  )
+  arg <- str_extract(command, pattern = "(?<=(cd|ls) ).*")
+  if (len > 0) {
+    outputs <- input[(index + 1):(index + len)]
+  } else {
+    outputs <- character()
+  }
+  list(
+    type = type,
+    arg = arg,
+    outputs = outputs
+  )
+}
+
+commands <- 
+  list(command_indices, output_lens) %>% 
+  pmap(parse_command)
+
 
 update_wd <- function(cwd, dirname) {
   if (dirname == "..") {
@@ -21,7 +52,6 @@ update_wd <- function(cwd, dirname) {
   cwd
 }
 
-update_wd("/a/bad", "..")
 
 file_system <- list(
   list(
@@ -78,7 +108,10 @@ parse_ls <- function(fs, dir_id, output) {
 
 parse_ls(file_system, 1, input[3:6])
 
-commands <- list()
+update_wd <-function(cwd, arg) {
+  ## TODO
+}
+
 
 for (line in input) {
   is_command <- str_detect(line, pattern = "$")
