@@ -4,12 +4,24 @@ library(tidyverse)
 
 input <- readLines("input.txt")
 
+
 after_cd <-
   input %>% 
   str_subset(pattern = "\\$ cd ") %>% 
   str_extract(pattern = "(?<=cd ).*")
 
 ## the only cd moves are one up or one down
+
+update_wd <- function(cwd, dirname) {
+  if (dirname == "..") {
+    cwd <- str_replace(cwd, pattern = "/\\w{1,}?$", replacement = "")
+  } else {
+    cwd <- str_c(cwd, dirname, sep = "/")
+  }
+  cwd
+}
+
+update_wd("/a/bad", "..")
 
 file_system <- list(
   list(
