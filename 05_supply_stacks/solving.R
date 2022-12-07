@@ -77,6 +77,58 @@ answer_1 <-
 
 answer_1
 
+### Note:  Fully-Vectorized Stack-Parsing ----
+
+## this is absurd, but one can get the initial
+## restricting oneself to vectorized operations only,
+## no native R loops or iteration, just some
+## matrix-fu
+
+input <- read_lines("input.txt")
+divider <- which(input == "")
+
+## read in the arrangement as a matrix of single characters:
+stacks_matrix_cluttered <- 
+  input[1:(divider - 1)] %>% 
+  ## each element of the character vector above has the
+  ## same number of characters, so we can split them out
+  ## and construct a matrix:
+  str_split(pattern = "") %>% 
+  unlist() %>% 
+  matrix(, ncol = str_length(input[divider - 1]), byrow = TRUE)
+
+
+n <- nrow(stacks_matrix_cluttered)
+## the bottom row has the digits:
+digits_row <- stacks_matrix_cluttered[n, ]
+
+initial_arrangement <- 
+  ## remove the chuff in between (" ", "[", and "]"):
+  stacks_matrix_cluttered[ , digits_row != " "] %>% 
+  ## the carton-stacks are upside down, so reverse them:
+  ## keeping the stack-numbers on the bottom:
+  .[c((n - 1):1, n), ] %>% 
+  ## back out to a single character vector:
+  as.vector() %>% 
+  ## then into a single string:
+  str_c(collapse = "") %>% 
+  ## get rid of the spaces that once filled out
+  ## the tops of the stacks:
+  str_replace_all(pattern = " ", replacement = "") %>% 
+  ## get rid of the final stack-number:
+  str_sub(start = 1, end = str_length(.) - 1) %>% 
+  ## in the above string, stacks of cartons are
+  ## separated by stack-numbers, so split by them:
+  str_split(pattern = "\\d") %>% 
+  unlist() %>% 
+  ## we now have a character vector where each element
+  ## is a string that represents the cartons in a
+  ## single stack.  we now split each stack into
+  ## a vector of cartons:
+  str_split(pattern = "")
+
+initial_arrangement
+
 ## Part 2 ----
 
 move_2 <- function(arrangement) {
@@ -110,7 +162,9 @@ answer_2 <-
 
 answer_2
 
-### Refactor ---
+### Refactor to Make more "Functional" ----
+
+## I am not yet satisfied with this, but ...
 
 input <- read_lines("input.txt")
 
