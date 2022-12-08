@@ -2,7 +2,7 @@ library(tidyverse)
 
 ## Part One ----
 
-input <- readLines("test.txt")
+input <- readLines("input.txt")
 
 mat <-
   input %>% 
@@ -54,10 +54,10 @@ view_score <- function(mat, i, j) {
   list(
     i = i,
     j = j,
-    s_top = ifelse(i == 1, 0, score(val, rev(mat[1:(i - 1), j])),
+    s_top = ifelse(i == 1, 0, score(val, rev(mat[1:(i - 1), j]))),
     s_bot = ifelse(i == m, 0, score(val, mat[(i + 1):m, j])),
-    s_left = ifelse(j == 1, 0, score(val, mat[i, 1:(j - 1)])),
-    s_right = ifelse(j == n, 0, score(val, rev(mat[i, (j + 1):n])))
+    s_left = ifelse(j == 1, 0, score(val, rev(mat[i, 1:(j - 1)]))),
+    s_right = ifelse(j == n, 0, score(val, mat[i, (j + 1):n]))
   )
 }
 
@@ -73,3 +73,5 @@ answer_2 <-
   df %>% 
   pull(view_score) %>% 
   max()
+
+answer_2
