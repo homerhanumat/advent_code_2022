@@ -137,7 +137,6 @@ tail_positions <- function(prev) {
 ## compute history of each successive tail:
 current <- head
 for (i in 2:10) {
-  print(i)
   current <- tail_positions(current)
 }
 
