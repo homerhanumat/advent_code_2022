@@ -35,6 +35,31 @@ readLines("input.txt") %>%
   sum() %>% 
   to_snafu()
 
+## iterative version of to_snafu:
+
+to_snafu_it <- function(n) {
+  remainders <- 0:4
+  digit <- c("0", "1", "2", "=", "-")
+  carry <- c(0, 0, 0, 1, 1)
+  current <- n
+  snafu <- ""
+  while (current > 4) {
+    rem <- current %% 5
+    quot <- current %/% 5
+    snafu <- str_c(digit[remainders == rem], snafu, sep = "")
+    current <- quot + carry[remainders == rem]
+  }
+  last <- 
+    case_when(
+      current == 0 ~ "0",
+      current == 1 ~ "1",
+      current == 2 ~ "2",
+      current == 3 ~ "1=",
+      current == 4 ~ "1-"
+    )
+  str_c(last, snafu, sep = "")
+}
+
 
 
 
